@@ -25,10 +25,27 @@ var INDUSTRIES = [
 ];
 
 var NAV = [
-  { label:"Science", href:"science.html" },
-  { label:"Industries", href:"industries.html" },
-  { label:"Resources", href:"resources.html" },
-  { label:"About", href:"about.html" }
+  { label:"Science", href:"science.html", children:[
+    ["The science","science.html"],
+    ["Why aragonite","science.html#why-aragonite"],
+    ["Carbon negative","science.html#carbon-negative"]
+  ]},
+  { label:"Industries", href:"industries.html", children:[
+    ["Glass manufacturing","industries.html#glass"],
+    ["Agriculture","industries.html#agriculture"],
+    ["Water treatment","industries.html#water-treatment"],
+    ["Plastics & polymers","industries.html#plastics"],
+    ["Construction & cement","industries.html#construction"],
+    ["All industries","industries.html"]
+  ]},
+  { label:"Resources", href:"resources.html", children:[
+    ["Technical data sheets","resources.html?cat=tds"],
+    ["Safety data sheets","resources.html?cat=sds"],
+    ["White papers","resources.html?cat=whitepapers"],
+    ["Knowledge center","resources.html#knowledge"]
+  ]},
+  { label:"About", href:"about.html" },
+  { label:"Contact", href:"contact.html" }
 ];
 
 /* small inline-SVG icon helpers (lucide paths) */
@@ -45,12 +62,31 @@ var ICON = {
 
 /* ---------- Shared header ---------- */
 function buildHeader(active){
-  var navHtml = NAV.map(function(n){
+  var mainNav = NAV.filter(function(n){ return n.label !== "Contact"; });
+  var navHtml = mainNav.map(function(n){
     var isActive = active === n.href ? " active" : "";
+    if(n.children){
+      var items = n.children.map(function(c){
+        return '<a class="dropdown-item" href="'+c[1]+'">'+c[0]+'</a>';
+      }).join("");
+      return '<div class="nav-group">'+
+        '<a class="nav-link'+isActive+'" href="'+n.href+'" aria-haspopup="true" aria-expanded="false">'+n.label+ICON.chevron+'</a>'+
+        '<div class="dropdown"><div class="dropdown-inner">'+items+'</div></div>'+
+      '</div>';
+    }
     return '<a class="nav-link'+isActive+'" href="'+n.href+'">'+n.label+'</a>';
   }).join("");
 
   var mobileLinks = NAV.map(function(n){
+    if(n.children){
+      var subs = n.children.map(function(c){
+        return '<a class="mobile-sublink" href="'+c[1]+'">'+c[0]+'</a>';
+      }).join("");
+      return '<div class="mobile-group">'+
+        '<button class="mobile-link mobile-parent" aria-expanded="false">'+n.label+ICON.chevron+'</button>'+
+        '<div class="mobile-sub">'+subs+'</div>'+
+      '</div>';
+    }
     return '<a class="mobile-link" href="'+n.href+'">'+n.label+'</a>';
   }).join("");
 
@@ -60,16 +96,13 @@ function buildHeader(active){
       '<a class="brand" href="index.html" aria-label="AragoCor Minerals home"><img src="images/aragocor-logo.png" alt="AragoCor Minerals" decoding="async"></a>'+
       '<nav class="main-nav">'+navHtml+'</nav>'+
       '<div class="header-cta">'+
-        '<a class="btn btn-sm btn-accent header-primary" href="contact.html?type=sample">Request Sample '+ICON.arrow+'</a>'+
+        '<a class="nav-contact'+(active==="contact.html"?" active":"")+'" href="contact.html">Contact '+ICON.arrow+'</a>'+
       '</div>'+
       '<button class="menu-toggle" id="menuToggle" aria-label="Open menu">'+ICON.menu+'</button>'+
     '</div>'+
     '<div class="mobile-menu" id="mobileMenu">'+
       '<div class="container-wide">'+
         mobileLinks+
-        '<div class="mobile-actions">'+
-          '<a class="btn btn-accent" href="contact.html?type=sample">Request Sample</a>'+
-        '</div>'+
       '</div>'+
     '</div>'+
   '</header>';
@@ -145,6 +178,22 @@ function initHeader(){
       toggle.innerHTML = open ? ICON.x : ICON.menu;
     });
   }
+
+  // Mobile submenu expand/collapse
+  header.querySelectorAll(".mobile-parent").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var group = btn.closest(".mobile-group");
+      var open = group.classList.toggle("open");
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  });
+
+  // Desktop dropdown: tap-to-open on touch, ESC to close
+  header.querySelectorAll(".nav-group").forEach(function(group){
+    var link = group.querySelector(".nav-link");
+    group.addEventListener("mouseenter", function(){ link.setAttribute("aria-expanded","true"); });
+    group.addEventListener("mouseleave", function(){ link.setAttribute("aria-expanded","false"); });
+  });
 }
 
 /* ---------- FAQ accordions ---------- */

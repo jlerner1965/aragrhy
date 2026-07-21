@@ -22,3 +22,7 @@ npm run preview
 ## Deployment
 
 The app can be deployed as a static Vite site. `public/_redirects` supports SPA fallback routing on Netlify-compatible hosts. Other static hosts should route all paths to `index.html`.
+
+## Merge-conflict resolution note
+
+If `index.html` conflicts with an older one-line Vite entry (`<div id="root"></div><script ...>`), keep the full HTML document in this repository. It includes the required metadata, manifest link, no-script fallback, root element, and Vite module script.

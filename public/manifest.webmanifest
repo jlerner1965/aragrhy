@@ -1,0 +1,10 @@
+{
+  "name": "Front Range Grow Intelligence",
+  "short_name": "FR Grow Intel",
+  "description": "Local-first cultivation planning and monitoring for Colorado Front Range outdoor growers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f3e8",
+  "theme_color": "#173128",
+  "icons": []
+}
